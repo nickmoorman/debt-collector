@@ -39,7 +39,9 @@ $(function() {
       this.$el.addClass("editing");
     },
     render: function() {
-      this.$el.html(this.template(this.model.toJSON()));
+      var vars = this.model.toJSON();
+      vars["id"] = Math.floor(Math.random()*10000);
+      this.$el.html(this.template(vars));
       this.inputs = {
         name: this.$(".name"),
         initialBalance: this.$(".initialBalance"),

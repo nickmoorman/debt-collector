@@ -21,10 +21,14 @@ block content
 
     script(type="text/template" id="account-template").
       <div class="account">
-        <input class="name" type="text" value="<%= name %>" />
-        <input class="initialBalance" type="text" value="<%= initialBalance %>" />
-        <input class="apr" type="text" value="<%= apr %>" />
-        <input class="minimumPayment" type="text" value="<%= minimumPayment %>" />
+        <label for="<%= id %>-name">Account Name</label>
+        <input id="<%= id %>-name" class="name" type="text" value="<%= name %>" />
+        <label for="<%= id %>-initialBalance">Initial (Current) Balance</label>
+        <input id="<%= id %>-initialBalance" class="initialBalance" type="text" value="<%= initialBalance %>" />
+        <label for="<%= id %>-apr">APR (.xxxx)</label>
+        <input id="<%= id %>-apr" class="apr" type="text" value="<%= apr %>" />
+        <label for="<%= id %>-minimumPayment">Minimum Monthly Payment</label>
+        <input id="<%= id %>-minimumPayment" class="minimumPayment" type="text" value="<%= minimumPayment %>" />
         <a class="save">Save</a>
         <a class="cancel">Cancel</a>
         <a class="delete">Delete</a>
