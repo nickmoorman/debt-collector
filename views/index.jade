@@ -1,5 +1,31 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  #debt-solver-app
+    header
+      h1= title
+      p Welcome to #{title}
+      p This app was written to help solve the all-too-familiar problem of paying off one's debt.
+
+    section#main
+      p Let's begin by adding your debt accounts.
+      a#create-account Create Account
+      #account-creator
+      ul#account-list
+
+    script(type="text/javascript" src="javascripts/libs/jquery-2.1.0.min.js")
+    script(type="text/javascript" src="javascripts/libs/underscore-1.6.0.min.js")
+    script(type="text/javascript" src="javascripts/libs/backbone-1.1.2.min.js")
+    script(type="text/javascript" src="javascripts/libs/backbone.localStorage-1.1.7.min.js")
+    script(type="text/javascript" src="javascripts/debt-solver.js")
+
+    script(type="text/template" id="account-template").
+      <div class="account">
+        <input class="name" type="text" value="<%= name %>" />
+        <input class="initialBalance" type="text" value="<%= initialBalance %>" />
+        <input class="apr" type="text" value="<%= apr %>" />
+        <input class="minimumPayment" type="text" value="<%= minimumPayment %>" />
+        <a class="save">Save</a>
+        <a class="cancel">Cancel</a>
+        <a class="delete">Delete</a>
+      </div>
