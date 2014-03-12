@@ -9,11 +9,11 @@ block content
 
     section#main
       p Let's begin by adding your debt accounts.
-      a#create-account Create Account
-      #account-creator
-      ul#account-list
+      a#create-account.button Add Account
+      ul#account-list.no-bullet.small-block-grid-3
 
     script(type="text/javascript" src="javascripts/libs/jquery-2.1.0.min.js")
+    script(type="text/javascript" src="javascripts/libs/foundation-5.2.0.min.js")
     script(type="text/javascript" src="javascripts/libs/underscore-1.6.0.min.js")
     script(type="text/javascript" src="javascripts/libs/backbone-1.1.2.min.js")
     script(type="text/javascript" src="javascripts/libs/backbone.localStorage-1.1.7.min.js")
@@ -29,7 +29,10 @@ block content
         <input id="<%= id %>-apr" class="apr" type="text" value="<%= apr %>" />
         <label for="<%= id %>-minimumPayment">Minimum Monthly Payment</label>
         <input id="<%= id %>-minimumPayment" class="minimumPayment" type="text" value="<%= minimumPayment %>" />
-        <a class="save">Save</a>
-        <a class="cancel">Cancel</a>
-        <a class="delete">Delete</a>
+        <a class="button save">Save</a>
+        <a class="button secondary cancel">Cancel</a>
+        <a class="button alert delete">Delete</a>
       </div>
+
+    script.
+      $(document).foundation();

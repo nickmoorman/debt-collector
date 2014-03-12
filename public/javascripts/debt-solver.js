@@ -36,6 +36,8 @@ $(function() {
       this.listenTo(this.model, "change", this.render);
       this.listenTo(this.model, "destroy", this.remove);
 
+      this.$el.addClass("large-4");
+      this.$el.addClass("column");
       this.$el.addClass("editing");
     },
     render: function() {

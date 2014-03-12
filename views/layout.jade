@@ -1,7 +1,13 @@
 doctype html
-html
+html.no-js(lang="en")
   head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
     title= title
+    link(rel='stylesheet', href='/stylesheets/libs/normalize.css')
+    link(rel='stylesheet', href='/stylesheets/libs/foundation-5.2.0.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
+
+    script(type="text/javascript" src="javascripts/libs/modernizr-2.7.2.min.js")
   body
     block content
