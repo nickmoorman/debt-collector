@@ -73,9 +73,9 @@ block content
       <div class="tabs-content">
         <% _.each(data, function(acct, index) { %>
           <div class="content<%= index == 0 ? ' active' : '' %>" id="panel-<%= index+1 %>">
-            <p>Paying only the minimum monthly payment of $<%= acct.minimumPayment %>/month,
-            it will take you <%= acct.months %> months to pay off this account in full.</p>
-            <p>You will end up paying $<%= acct.futureValue %> total, $<%= acct.interest %> of which
+            <p>Paying only the minimum monthly payment of $<strong><%= acct.minimumPayment %></strong>/month,
+            it will take you <strong><%= acct.months %></strong> months to pay off this debt in full.</p>
+            <p>You will end up paying <strong>$<%= acct.futureValue %></strong> total, <strong>$<%= acct.interest %></strong> of which
             will be interest.</p>
           </div>
         <% }); %>

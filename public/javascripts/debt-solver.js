@@ -165,6 +165,9 @@ $(function() {
 
         data.push(vars);
       });
+      allAccounts["minimumPayment"] = allAccounts["minimumPayment"].toFixed(2);
+      allAccounts["futureValue"] = allAccounts["futureValue"].toFixed(2);
+      allAccounts["interest"] = allAccounts["interest"].toFixed(2);
       data.push(allAccounts);
 
       $("#basics-list").append(basicsTemplate({data: data}));
