@@ -6,6 +6,7 @@ $(function() {
         initialBalance: 100,
         apr: .1234,
         minimumPayment: 50,
+        isNew: true,
         order: Accounts.nextOrder()
       };
     },
@@ -39,7 +40,7 @@ $(function() {
     tagName: "li",
     template: _.template($("#account-template").html()),
     events: {
-      "dblclick .account": "edit",
+      "click a.edit-button": "edit",
       "click a.save": "save",
       "click a.cancel": "close",
       "click a.delete": "destroy"
@@ -66,7 +67,8 @@ $(function() {
       return this;
     },
     edit: function() {
-      this.$el.addClass("editing");
+      this.$(".view").addClass("hide");
+      this.$(".edit").removeClass("hide");
       this.inputs["name"].focus();
     },
     save: function() {
@@ -79,13 +81,15 @@ $(function() {
         name: name,
         initialBalance: initialBalance,
         apr: apr,
-        minimumPayment: minimumPayment
+        minimumPayment: minimumPayment,
+        isNew: false
       });
 
       this.close();
     },
     close: function() {
-      this.$el.removeClass("editing");
+      this.$(".edit").addClass("hide");
+      this.$(".view").removeClass("hide");
     },
     destroy: function() {
       this.model.destroy();

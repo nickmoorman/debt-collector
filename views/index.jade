@@ -30,17 +30,37 @@ block content
 
     script(type="text/template" id="account-template").
       <div class="account">
-        <label for="<%= id %>-name">Account Name</label>
-        <input id="<%= id %>-name" class="name" type="text" value="<%= name %>" />
-        <label for="<%= id %>-initialBalance">Initial (Current) Balance</label>
-        <input id="<%= id %>-initialBalance" class="initialBalance" type="text" value="<%= initialBalance %>" />
-        <label for="<%= id %>-apr">APR (.xxxx)</label>
-        <input id="<%= id %>-apr" class="apr" type="text" value="<%= apr %>" />
-        <label for="<%= id %>-minimumPayment">Minimum Monthly Payment</label>
-        <input id="<%= id %>-minimumPayment" class="minimumPayment" type="text" value="<%= minimumPayment %>" />
-        <a class="button save">Save</a>
-        <a class="button secondary cancel">Cancel</a>
-        <a class="button alert delete">Delete</a>
+        <div class="edit<%= isNew ? '' : ' hide' %>">
+          <label for="<%= id %>-name">Account Name</label>
+          <input id="<%= id %>-name" class="name" type="text" value="<%= name %>" />
+          <label for="<%= id %>-initialBalance">Initial (Current) Balance</label>
+          <input id="<%= id %>-initialBalance" class="initialBalance" type="text" value="<%= initialBalance %>" />
+          <label for="<%= id %>-apr">APR (.xxxx)</label>
+          <input id="<%= id %>-apr" class="apr" type="text" value="<%= apr %>" />
+          <label for="<%= id %>-minimumPayment">Minimum Monthly Payment</label>
+          <input id="<%= id %>-minimumPayment" class="minimumPayment" type="text" value="<%= minimumPayment %>" />
+          <a class="button save">Save</a>
+          <a class="button secondary cancel">Cancel</a>
+          <a class="button alert delete">Delete</a>
+        </div>
+        <div class="view<%= isNew ? ' hide' : '' %>">
+          <h3><%= name %></h3>
+          <table>
+            <tr>
+              <td><strong>Initial (Current) Balance</strong></td>
+              <td>$<%= initialBalance %></td>
+            </tr>
+            <tr>
+              <td><strong>APR (.xxxx)</strong></td>
+              <td><%= apr %></td>
+            </tr>
+            <tr>
+              <td><strong>Minimum Monthly Payment</strong></td>
+              <td>$<%= minimumPayment %>/month</td>
+            </tr>
+          </table>
+          <a class="button edit-button">Edit</a>
+        </div>
       </div>
 
     script(type="text/template" id="account-basics-template").
