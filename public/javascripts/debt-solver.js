@@ -142,13 +142,29 @@ $(function() {
     runBasicCalculations: function() {
       $("#basics").removeClass("hide");
       var basicsTemplate = _.template($("#account-basics-template").html());
+
+      var allAccounts = {
+        name: "All Accounts",
+        minimumPayment: 0,
+        months: 0,
+        futureValue: 0,
+        interest: 0
+      };
       Accounts.each(function(model, index) {
         var vars = model.toJSON();
         vars["months"] = model.solveForTime().toFixed(2);
         vars["futureValue"] = model.calculateFutureValue(vars["months"]).toFixed(2);
         vars["interest"] = (vars["futureValue"] - vars["initialBalance"]).toFixed(2);
+
+        // TODO: Find a better way to do this...
+        allAccounts["minimumPayment"] = parseFloat(allAccounts["minimumPayment"]) + parseFloat(vars["minimumPayment"]);
+        allAccounts["months"] = Math.max(allAccounts["months"], vars["months"]);
+        allAccounts["futureValue"] = parseFloat(allAccounts["futureValue"]) + parseFloat(vars["futureValue"]);
+        allAccounts["interest"] = parseFloat(allAccounts["interest"]) + parseFloat(vars["interest"]);
+
         $("#basics-list").append(basicsTemplate(vars));
       });
+      $("#basics-list").append(basicsTemplate(allAccounts));
     }
   });
 
