@@ -25,8 +25,29 @@ block content
           p.
             <em>"How did you do that?"</em>, you may wonder.  The formulas used
             to calculate the numbers you see here were put together based on a
-            couple different formulas.  In the future, I'll describe those formulas
-            here.
+            couple different formulas.  See <a href="http://www.patrickschneider.com/blog/2008/03/compound-interest-with-an-initial-balance-and-monthly-contributions/">
+            this blog post</a> for more details.  The gist of it is that I combined the
+            Capital Accumulation Formula:
+            \[ FV = PV * (1+i)^n \]
+            with the Future Value of a Series Formula:
+            \[ FV = PMT * \frac{(1+i)^n-1}{i} \]
+            to derive several new formulas.
+          p In the above:
+            ul
+              li FV = Future Value
+              li PV = Present Value
+              li PMT = Periodic Payment Amount
+              li i = interest rate per period
+              li n = number of periods
+          p.
+            Simply adding the two formulas together yields
+            the future value of the debt, assuming monthly compounded interest is added, and
+            monthly payments are subtracted.  Simplifying this formula, we get:
+            \[ futureValue = initialBalance * ({1+\frac{apr}{12}})^{months} \]
+            From there, I was able to derive the following formula, which yields the number of
+            months it will take for the debt to be completely paid off:
+            \[ monthsToPayoff = \frac{\log{(\frac{\frac{-monthlyPayment}{\frac{apr}{12}}}{initialBalance-\frac{monthlyPayment}{\frac{apr}{12}}})}}{\log{(1+\frac{apr}{12})}} \]
+
 
     script(type="text/javascript" src="javascripts/libs/jquery-2.1.0.min.js")
     script(type="text/javascript" src="javascripts/libs/fastclick-0.6.12.min.js")
@@ -34,6 +55,7 @@ block content
     script(type="text/javascript" src="javascripts/libs/underscore-1.6.0.min.js")
     script(type="text/javascript" src="javascripts/libs/backbone-1.1.2.min.js")
     script(type="text/javascript" src="javascripts/libs/backbone.localStorage-1.1.7.min.js")
+    script(type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
     script(type="text/javascript" src="javascripts/debt-solver.js")
 
     script(type="text/template" id="account-template").
