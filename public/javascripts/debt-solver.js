@@ -143,6 +143,7 @@ $(function() {
       $("#basics").removeClass("hide");
       var basicsTemplate = _.template($("#account-basics-template").html());
 
+      var data = [];
       var allAccounts = {
         name: "All Accounts",
         minimumPayment: 0,
@@ -162,9 +163,11 @@ $(function() {
         allAccounts["futureValue"] = parseFloat(allAccounts["futureValue"]) + parseFloat(vars["futureValue"]);
         allAccounts["interest"] = parseFloat(allAccounts["interest"]) + parseFloat(vars["interest"]);
 
-        $("#basics-list").append(basicsTemplate(vars));
+        data.push(vars);
       });
-      $("#basics-list").append(basicsTemplate(allAccounts));
+      data.push(allAccounts);
+
+      $("#basics-list").append(basicsTemplate({data: data}));
     }
   });
 
