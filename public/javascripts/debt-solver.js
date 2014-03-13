@@ -8,6 +8,18 @@ $(function() {
         minimumPayment: 50,
         order: Accounts.nextOrder()
       };
+    },
+    solveForTime: function(monthlyPayment) {
+      if (!monthlyPayment) {
+        monthlyPayment = this.get("minimumPayment");
+      }
+      return Math.log((-monthlyPayment/(this.get("apr")/12))/(this.get("initialBalance")-monthlyPayment/(this.get("apr")/12)))/Math.log(1+(this.get("apr")/12));
+    },
+    solveForPayment: function(months) {
+      return Math.abs(((this.get("apr")/12)*(-this.get("initialBalance")*Math.pow((1+(this.get("apr")/12), months))))/(Math.pow((1+(this.get("apr")/12)), months)-1));
+    },
+    calculateFutureValue: function(months) {
+      return this.get("initialBalance")*Math.pow((1+(this.get("apr")/12)), months);
     }
   });
 
@@ -83,12 +95,15 @@ $(function() {
   var AppView = Backbone.View.extend({
     el: $("#debt-solver-app"),
     events: {
-      "click #create-account": "createAccount"
+      "click #create-account": "createAccount",
+      "click #accounts-done": "runBasicCalculations"
     },
     initialize: function() {
       this.listenTo(Accounts, "add", this.addAccount);
       this.listenTo(Accounts, "reset", this.addAllAccounts);
       this.listenTo(Accounts, "all", this.render);
+      this.listenTo(Accounts, "add", this.showDoneButton);
+      this.listenTo(Accounts, "remove", this.hideDoneButton);
 
       Accounts.fetch();
     },
@@ -105,6 +120,31 @@ $(function() {
     },
     addAllAccounts: function() {
       Accounts.each(this.addAccount, this);
+    },
+    showDoneButton: function() {
+      if (Accounts.length > 0) {
+        if ($("#accounts-done").hasClass("hidden")) {
+          $("#accounts-done").removeClass("hidden");
+        }
+      }
+    },
+    hideDoneButton: function() {
+      if (Accounts.length == 0) {
+        if (!$("#accounts-done").hasClass("hidden")) {
+          $("#accounts-done").addClass("hidden");
+        }
+      }
+    },
+    runBasicCalculations: function() {
+      $("#basics").removeClass("hide");
+      var basicsTemplate = _.template($("#account-basics-template").html());
+      Accounts.each(function(model, index) {
+        var vars = model.toJSON();
+        vars["months"] = model.solveForTime().toFixed(2);
+        vars["futureValue"] = model.calculateFutureValue(vars["months"]).toFixed(2);
+        vars["interest"] = (vars["futureValue"] - vars["initialBalance"]).toFixed(2);
+        $("#basics-list").append(basicsTemplate(vars));
+      });
     }
   });
 
