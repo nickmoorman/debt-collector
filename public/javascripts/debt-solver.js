@@ -23,22 +23,44 @@ $(function() {
       return this.get("initialBalance")*Math.pow((1+(this.get("apr")/12)), months);
     }
   });
+  var Loan = Account.extend({
+  });
 
   var AccountList = Backbone.Collection.extend({
     model: Account,
-    localStorage: new Backbone.LocalStorage("debt-solver"),
+    localStorage: new Backbone.LocalStorage("debt-solver-account"),
     nextOrder: function() {
       if (!this.length) return 1;
       return this.last().get('order') + 1;
     },
     comparator: 'order'
   });
+  var LoanList = AccountList.extend({
+    model: Loan,
+    localStorage: new Backbone.LocalStorage("debt-solver-loan")
+  });
 
   var Accounts = new AccountList;
+  var Loans = new LoanList;
+
+  // Extend Underscore's template() to allow inclusions
+  // From http://emptysqua.re/blog/adding-an-include-tag-to-underscore-js-templates/
+  function template(str) {
+      // match "<% include template-id %>"
+      return _.template(
+          str.replace(
+              /<%\s*include\s*(.*?)\s*%>/g,
+              function(match, templateId) {
+                  var el = document.getElementById(templateId);
+                  return el ? el.innerHTML : '';
+              }
+          )
+      );
+  }
 
   var AccountView = Backbone.View.extend({
     tagName: "li",
-    template: _.template($("#account-template").html()),
+    template: template($("#account-template").html()),
     events: {
       "click a.edit-button": "edit",
       "click a.save": "save",
@@ -91,12 +113,16 @@ $(function() {
       this.model.destroy();
     }
   });
+  var LoanView = AccountView.extend({
+    template: template($("#loan-template").html())
+  });
 
   var AppView = Backbone.View.extend({
     el: $("#debt-solver-app"),
     events: {
-      "click #create-account": "createAccount",
-      "click #accounts-done": "runBasicCalculations"
+      "click #add-account": "createAccount",
+      "click #accounts-done": "runBasicCalculations",
+      "click #add-loan": "createLoan"
     },
     initialize: function() {
       this.listenTo(Accounts, "add", this.addAccount);
@@ -104,6 +130,9 @@ $(function() {
       this.listenTo(Accounts, "all", this.render);
       this.listenTo(Accounts, "add", this.showDoneButton);
       this.listenTo(Accounts, "remove", this.hideDoneButton);
+      this.listenTo(Loans, "add", this.addLoan);
+      this.listenTo(Loans, "reset", this.addAllLoans);
+      this.listenTo(Loans, "all", this.render);
 
       Accounts.fetch();
     },
@@ -167,7 +196,33 @@ $(function() {
       data.push(allAccounts);
 
       $("#basics-list").append(basicsTemplate({data: data}));
-    }
+    },
+    createLoan: function() {
+      Loans.create();
+    },
+    addLoan: function(loan) {
+      var view = new LoanView({
+        model: loan
+      });
+      var li = view.render().el;
+      $(li).addClass("row");
+      $(li).addClass("full-width");
+      var loanTemplate = _.template($("#loan-details-template").html());
+      var loanDetails = loan.toJSON();
+      var data = {
+        minimumPayment: loanDetails.minimumPayment
+      };
+      data["months"] = loan.solveForTime().toFixed(2);
+      data["futureValue"] = loan.calculateFutureValue(data["months"]).toFixed(2);
+      data["interest"] = (data["futureValue"] - data["initialBalance"]).toFixed(2);
+
+      // TODO: Figure out why this isn't appending...
+      $(".view", li).append(loanTemplate(data));
+      this.$("#loan-list").append(li);
+    },
+    addAllLoans: function() {
+      Loans.each(this.addLoan, this);
+    },
   });
 
   var App = new AppView;

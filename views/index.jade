@@ -11,7 +11,7 @@ block content
 
     section#accounts
       p Let's begin by adding your debt accounts.
-      a#create-account.button Add Account
+      a#add-account.button Add Account
       a#accounts-done.button.hidden Done Adding Accounts
       ul#account-list.no-bullet.small-block-grid-3
 
@@ -47,7 +47,11 @@ block content
             From there, I was able to derive the following formula, which yields the number of
             months it will take for the debt to be completely paid off:
             \[ monthsToPayoff = \frac{\log{(\frac{\frac{-monthlyPayment}{\frac{apr}{12}}}{initialBalance-\frac{monthlyPayment}{\frac{apr}{12}}})}}{\log{(1+\frac{apr}{12})}} \]
-
+      p.
+        If you're like me, you probably aren't too happy with these results.  Let's see what we can do
+        to fix that by taking out a consolidation loan.
+      a#add-loan.button Add Loan
+      ul#loan-list.no-bullet
 
     script(type="text/javascript" src="javascripts/libs/jquery-2.1.0.min.js")
     script(type="text/javascript" src="javascripts/libs/fastclick-0.6.12.min.js")
@@ -58,21 +62,24 @@ block content
     script(type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
     script(type="text/javascript" src="javascripts/debt-solver.js")
 
+    script(type="text/template" id="editor-template").
+      <div class="edit<%= isNew ? '' : ' hide' %>">
+        <label for="<%= id %>-name">Account Name</label>
+        <input id="<%= id %>-name" class="name" type="text" value="<%= name %>" />
+        <label for="<%= id %>-initialBalance">Initial (Current) Balance</label>
+        <input id="<%= id %>-initialBalance" class="initialBalance" type="text" value="<%= initialBalance %>" />
+        <label for="<%= id %>-apr">APR (.xxxx)</label>
+        <input id="<%= id %>-apr" class="apr" type="text" value="<%= apr %>" />
+        <label for="<%= id %>-minimumPayment">Minimum Monthly Payment</label>
+        <input id="<%= id %>-minimumPayment" class="minimumPayment" type="text" value="<%= minimumPayment %>" />
+        <a class="button save">Save</a>
+        <a class="button secondary cancel">Cancel</a>
+        <a class="button alert delete">Delete</a>
+      </div>
+
     script(type="text/template" id="account-template").
       <div class="account">
-        <div class="edit<%= isNew ? '' : ' hide' %>">
-          <label for="<%= id %>-name">Account Name</label>
-          <input id="<%= id %>-name" class="name" type="text" value="<%= name %>" />
-          <label for="<%= id %>-initialBalance">Initial (Current) Balance</label>
-          <input id="<%= id %>-initialBalance" class="initialBalance" type="text" value="<%= initialBalance %>" />
-          <label for="<%= id %>-apr">APR (.xxxx)</label>
-          <input id="<%= id %>-apr" class="apr" type="text" value="<%= apr %>" />
-          <label for="<%= id %>-minimumPayment">Minimum Monthly Payment</label>
-          <input id="<%= id %>-minimumPayment" class="minimumPayment" type="text" value="<%= minimumPayment %>" />
-          <a class="button save">Save</a>
-          <a class="button secondary cancel">Cancel</a>
-          <a class="button alert delete">Delete</a>
-        </div>
+        <% include editor-template %>
         <div class="view<%= isNew ? ' hide' : '' %>">
           <h3><%= name %></h3>
           <table>
@@ -91,6 +98,37 @@ block content
           </table>
           <a class="button edit-button">Edit</a>
         </div>
+      </div>
+
+    script(type="text/template" id="loan-template").
+      <div class="loan small-4">
+        <% include editor-template %>
+        <div class="view<%= isNew ? ' hide' : '' %>">
+          <h3><%= name %></h3>
+          <table>
+            <tr>
+              <td><strong>Initial (Current) Balance</strong></td>
+              <td>$<%= initialBalance %></td>
+            </tr>
+            <tr>
+              <td><strong>APR (.xxxx)</strong></td>
+              <td><%= apr %></td>
+            </tr>
+            <tr>
+              <td><strong>Minimum Monthly Payment</strong></td>
+              <td>$<%= minimumPayment %>/month</td>
+            </tr>
+          </table>
+          <a class="button edit-button">Edit</a>
+        </div>
+      </div>
+
+    script(type="text/template" id="loan-details-template").
+      <div class="small-8">
+        <p>Paying only the minimum monthly payment of $<strong><%= minimumPayment %></strong>/month,
+        it will take you <strong><%= months %></strong> months to pay off this debt in full.</p>
+        <p>You will end up paying <strong>$<%= futureValue %></strong> total, <strong>$<%= interest %></strong> of which
+        will be interest.</p>
       </div>
 
     script(type="text/template" id="account-basics-template").
