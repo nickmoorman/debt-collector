@@ -63,7 +63,7 @@ block content
     script(type="text/javascript" src="javascripts/debt-solver.js")
 
     script(type="text/template" id="editor-template").
-      <div class="edit<%= isNew ? '' : ' hide' %>">
+      <div class="edit<%= isNewObject ? '' : ' hide' %>">
         <label for="<%= id %>-name">Account Name</label>
         <input id="<%= id %>-name" class="name" type="text" value="<%= name %>" />
         <label for="<%= id %>-initialBalance">Initial (Current) Balance</label>
@@ -74,13 +74,13 @@ block content
         <input id="<%= id %>-minimumPayment" class="minimumPayment" type="text" value="<%= minimumPayment %>" />
         <a class="button save">Save</a>
         <a class="button secondary cancel">Cancel</a>
-        <a class="button alert delete">Delete</a>
+        <% if (!isNewObject) { %><a class="button alert delete">Delete</a><% } %>
       </div>
 
     script(type="text/template" id="account-template").
       <div class="account">
         <% include editor-template %>
-        <div class="view<%= isNew ? ' hide' : '' %>">
+        <div class="view<%= isNewObject ? ' hide' : '' %>">
           <h3><%= name %></h3>
           <table>
             <tr>
@@ -103,7 +103,7 @@ block content
     script(type="text/template" id="loan-template").
       <div class="loan small-4">
         <% include editor-template %>
-        <div class="view<%= isNew ? ' hide' : '' %>">
+        <div class="view<%= isNewObject ? ' hide' : '' %>">
           <h3><%= name %></h3>
           <table>
             <tr>

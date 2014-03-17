@@ -6,7 +6,7 @@ $(function() {
         initialBalance: 100,
         apr: .1234,
         minimumPayment: 50,
-        isNew: true,
+        isNewObject: true,
         order: Accounts.nextOrder()
       };
     },
@@ -68,6 +68,9 @@ $(function() {
       "click a.delete": "destroy"
     },
     initialize: function() {
+      if (!(this.model instanceof Account)) {
+        this.model = new Account;
+      }
       this.listenTo(this.model, "change", this.render);
       this.listenTo(this.model, "destroy", this.remove);
     },
@@ -95,26 +98,40 @@ $(function() {
       var apr = this.inputs["apr"].val();
       var minimumPayment = this.inputs["minimumPayment"].val();
 
-      this.model.save({
+      this.model.set({
         name: name,
         initialBalance: initialBalance,
         apr: apr,
         minimumPayment: minimumPayment,
-        isNew: false
+        isNewObject: false
       });
+      this.model.save();
 
       this.close();
     },
     close: function() {
-      this.$(".edit").addClass("hide");
-      this.$(".view").removeClass("hide");
+      if (this.model.get("isNewObject")) {
+        this.destroy();
+        this.remove();
+      } else {
+        this.$(".edit").addClass("hide");
+        this.$(".view").removeClass("hide");
+      }
     },
     destroy: function() {
       this.model.destroy();
     }
   });
   var LoanView = AccountView.extend({
-    template: template($("#loan-template").html())
+    template: template($("#loan-template").html()),
+    className: "row full-width",
+    initialize: function() {
+      if (!(this.model instanceof Loan)) {
+        this.model = new Loan;
+      }
+      this.listenTo(this.model, "change", this.render);
+      this.listenTo(this.model, "destroy", this.remove);
+    }
   });
 
   var AppView = Backbone.View.extend({
@@ -205,8 +222,6 @@ $(function() {
         model: loan
       });
       var li = view.render().el;
-      $(li).addClass("row");
-      $(li).addClass("full-width");
       var loanTemplate = _.template($("#loan-details-template").html());
       var loanDetails = loan.toJSON();
       var data = {
