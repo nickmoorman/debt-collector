@@ -124,13 +124,29 @@ $(function() {
   });
   var LoanView = AccountView.extend({
     template: template($("#loan-template").html()),
-    className: "row full-width",
     initialize: function() {
       if (!(this.model instanceof Loan)) {
         this.model = new Loan;
       }
       this.listenTo(this.model, "change", this.render);
       this.listenTo(this.model, "destroy", this.remove);
+    },
+    render: function() {
+      var data = this.model.toJSON();
+      data["id"] = Math.floor(Math.random()*10000);
+      data["months"] = this.model.solveForTime().toFixed(2);
+      data["futureValue"] = this.model.calculateFutureValue(data["months"]).toFixed(2);
+      data["interest"] = (data["futureValue"] - data["initialBalance"]).toFixed(2);
+      this.$el.html(this.template(data));
+
+      this.inputs = {
+        name: this.$(".name"),
+        initialBalance: this.$(".initialBalance"),
+        apr: this.$(".apr"),
+        minimumPayment: this.$(".minimumPayment")
+      };
+
+      return this;
     }
   });
 
@@ -183,7 +199,7 @@ $(function() {
     },
     runBasicCalculations: function() {
       $("#basics").removeClass("hide");
-      var basicsTemplate = _.template($("#account-basics-template").html());
+      var basicsTemplate = template($("#account-basics-template").html());
 
       var data = [];
       var allAccounts = {
@@ -213,6 +229,8 @@ $(function() {
       data.push(allAccounts);
 
       $("#basics-list").append(basicsTemplate({data: data}));
+
+      Loans.fetch();
     },
     createLoan: function() {
       Loans.create();
@@ -221,23 +239,11 @@ $(function() {
       var view = new LoanView({
         model: loan
       });
-      var li = view.render().el;
-      var loanTemplate = _.template($("#loan-details-template").html());
-      var loanDetails = loan.toJSON();
-      var data = {
-        minimumPayment: loanDetails.minimumPayment
-      };
-      data["months"] = loan.solveForTime().toFixed(2);
-      data["futureValue"] = loan.calculateFutureValue(data["months"]).toFixed(2);
-      data["interest"] = (data["futureValue"] - data["initialBalance"]).toFixed(2);
-
-      // TODO: Figure out why this isn't appending...
-      $(".view", li).append(loanTemplate(data));
-      this.$("#loan-list").append(li);
+      this.$("#loan-list").append(view.render().$el);
     },
     addAllLoans: function() {
       Loans.each(this.addLoan, this);
-    },
+    }
   });
 
   var App = new AppView;

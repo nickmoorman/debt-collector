@@ -51,7 +51,7 @@ block content
         If you're like me, you probably aren't too happy with these results.  Let's see what we can do
         to fix that by taking out a consolidation loan.
       a#add-loan.button Add Loan
-      ul#loan-list.no-bullet
+      ul#loan-list.no-bullet.small-block-grid-3
 
     script(type="text/javascript" src="javascripts/libs/jquery-2.1.0.min.js")
     script(type="text/javascript" src="javascripts/libs/fastclick-0.6.12.min.js")
@@ -101,7 +101,7 @@ block content
       </div>
 
     script(type="text/template" id="loan-template").
-      <div class="loan small-4">
+      <div class="loan">
         <% include editor-template %>
         <div class="view<%= isNewObject ? ' hide' : '' %>">
           <h3><%= name %></h3>
@@ -119,17 +119,18 @@ block content
               <td>$<%= minimumPayment %>/month</td>
             </tr>
           </table>
+          <div>
+            <% include loan-details-template %>
+          </div>
           <a class="button edit-button">Edit</a>
         </div>
       </div>
 
     script(type="text/template" id="loan-details-template").
-      <div class="small-8">
-        <p>Paying only the minimum monthly payment of $<strong><%= minimumPayment %></strong>/month,
-        it will take you <strong><%= months %></strong> months to pay off this debt in full.</p>
-        <p>You will end up paying <strong>$<%= futureValue %></strong> total, <strong>$<%= interest %></strong> of which
-        will be interest.</p>
-      </div>
+      <p>Paying only the minimum monthly payment of $<strong><%= minimumPayment %></strong>/month,
+      it will take you <strong><%= months %></strong> months to pay off this debt in full.</p>
+      <p>You will end up paying <strong>$<%= futureValue %></strong> total, <strong>$<%= interest %></strong> of which
+      will be interest.</p>
 
     script(type="text/template" id="account-basics-template").
       <dl class="tabs" data-tab>
@@ -139,11 +140,9 @@ block content
       </dl>
       <div class="tabs-content">
         <% _.each(data, function(acct, index) { %>
+          <% var minimumPayment = acct.minimumPayment, months = acct.months, futureValue = acct.futureValue, interest = acct.interest; %>
           <div class="content<%= index == 0 ? ' active' : '' %>" id="panel-<%= index+1 %>">
-            <p>Paying only the minimum monthly payment of $<strong><%= acct.minimumPayment %></strong>/month,
-            it will take you <strong><%= acct.months %></strong> months to pay off this debt in full.</p>
-            <p>You will end up paying <strong>$<%= acct.futureValue %></strong> total, <strong>$<%= acct.interest %></strong> of which
-            will be interest.</p>
+            <% include loan-details-template %>
           </div>
         <% }); %>
       </div>
