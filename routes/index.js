@@ -4,5 +4,5 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Debt Solver' });
+  res.render('index', { title: 'Debt Collector' });
 };

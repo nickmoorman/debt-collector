@@ -1,6 +1,16 @@
 {
-  "name": "application-name",
+  "name": "debt-collector",
   "version": "0.0.1",
+  "description": "A simple tool to help you become debt free faster!",
+  "author": {
+    "name": "Nick Sawyer",
+    "email": "nick@nicksawyer.net",
+    "url": "http://www.nicksawyer.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/nickmoorman/debt-collector.git"
+  },
   "private": true,
   "scripts": {
     "start": "node app.js"

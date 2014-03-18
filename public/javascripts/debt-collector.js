@@ -28,7 +28,7 @@ $(function() {
 
   var AccountList = Backbone.Collection.extend({
     model: Account,
-    localStorage: new Backbone.LocalStorage("debt-solver-account"),
+    localStorage: new Backbone.LocalStorage("debt-collector-account"),
     nextOrder: function() {
       if (!this.length) return 1;
       return this.last().get('order') + 1;
@@ -37,7 +37,7 @@ $(function() {
   });
   var LoanList = AccountList.extend({
     model: Loan,
-    localStorage: new Backbone.LocalStorage("debt-solver-loan")
+    localStorage: new Backbone.LocalStorage("debt-collector-loan")
   });
 
   var Accounts = new AccountList;
@@ -151,7 +151,7 @@ $(function() {
   });
 
   var AppView = Backbone.View.extend({
-    el: $("#debt-solver-app"),
+    el: $("#debt-collector-app"),
     events: {
       "click #add-account": "createAccount",
       "click #accounts-done": "runBasicCalculations",
