@@ -43,24 +43,27 @@ $(function() {
   var Accounts = new AccountList;
   var Loans = new LoanList;
 
-  // Extend Underscore's template() to allow inclusions
-  // From http://emptysqua.re/blog/adding-an-include-tag-to-underscore-js-templates/
-  function template(str) {
-      // match "<% include template-id %>"
-      return _.template(
-          str.replace(
-              /<%\s*include\s*(.*?)\s*%>/g,
-              function(match, templateId) {
-                  var el = document.getElementById(templateId);
-                  return el ? el.innerHTML : '';
-              }
-          )
-      );
-  }
+  // Extend Underscore's template() to allow recursive template inclusions
+  // From https://gist.github.com/unicodefreak/1901458
+  // (with modifications from http://emptysqua.re/blog/adding-an-include-tag-to-underscore-js-templates/#comment-1237991965)
+  // which is based on http://emptysqua.re/blog/adding-an-include-tag-to-underscore-js-templates/
+  var _underscore_template = _.template;
+  _.template = function(str, data) {
+    // match "<% include template-id %>"
+    while (str != (str = str.replace(
+      /<%\sinclude\s*(.*?)\s%>/g,
+      function(match, templateId) {
+        var el = $('#' + templateId);
+        return el ? el.html() : '';
+      }
+    )));
+
+    return _underscore_template(str, data);
+  };
 
   var AccountView = Backbone.View.extend({
     tagName: "li",
-    template: template($("#account-template").html()),
+    template: _.template($("#account-template").html()),
     events: {
       "click a.edit-button": "edit",
       "click a.save": "save",
@@ -75,9 +78,13 @@ $(function() {
       this.listenTo(this.model, "destroy", this.remove);
     },
     render: function() {
-      var vars = this.model.toJSON();
-      vars["id"] = Math.floor(Math.random()*10000);
-      this.$el.html(this.template(vars));
+      var data = this.model.toJSON();
+      data["id"] = Math.floor(Math.random()*10000);
+      data["months"] = this.model.solveForTime().toFixed(2);
+      data["futureValue"] = this.model.calculateFutureValue(data["months"]).toFixed(2);
+      data["interest"] = (data["futureValue"] - data["initialBalance"]).toFixed(2);
+      this.$el.html(this.template(data));
+
       this.inputs = {
         name: this.$(".name"),
         initialBalance: this.$(".initialBalance"),
@@ -123,30 +130,13 @@ $(function() {
     }
   });
   var LoanView = AccountView.extend({
-    template: template($("#loan-template").html()),
+    template: _.template($("#loan-template").html()),
     initialize: function() {
       if (!(this.model instanceof Loan)) {
         this.model = new Loan;
       }
       this.listenTo(this.model, "change", this.render);
       this.listenTo(this.model, "destroy", this.remove);
-    },
-    render: function() {
-      var data = this.model.toJSON();
-      data["id"] = Math.floor(Math.random()*10000);
-      data["months"] = this.model.solveForTime().toFixed(2);
-      data["futureValue"] = this.model.calculateFutureValue(data["months"]).toFixed(2);
-      data["interest"] = (data["futureValue"] - data["initialBalance"]).toFixed(2);
-      this.$el.html(this.template(data));
-
-      this.inputs = {
-        name: this.$(".name"),
-        initialBalance: this.$(".initialBalance"),
-        apr: this.$(".apr"),
-        minimumPayment: this.$(".minimumPayment")
-      };
-
-      return this;
     }
   });
 
@@ -199,7 +189,7 @@ $(function() {
     },
     runBasicCalculations: function() {
       $("#basics").removeClass("hide");
-      var basicsTemplate = template($("#account-basics-template").html());
+      var basicsTemplate = _.template($("#account-basics-template").html());
 
       var data = [];
       var allAccounts = {

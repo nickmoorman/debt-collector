@@ -77,53 +77,39 @@ block content
         <% if (!isNewObject) { %><a class="button alert delete">Delete</a><% } %>
       </div>
 
+    script(type="text/template" id="viewer-template").
+      <div class="view<%= isNewObject ? ' hide' : '' %>">
+        <h3><%= name %></h3>
+        <table>
+          <tr>
+            <td><strong>Initial (Current) Balance</strong></td>
+            <td>$<%= initialBalance %></td>
+          </tr>
+          <tr>
+            <td><strong>APR (.xxxx)</strong></td>
+            <td><%= apr %></td>
+          </tr>
+          <tr>
+            <td><strong>Minimum Monthly Payment</strong></td>
+            <td>$<%= minimumPayment %>/month</td>
+          </tr>
+        </table>
+        <div>
+          <% include loan-details-template %>
+        </div>
+        <a class="button edit-button">Edit</a>
+      </div>
+
     script(type="text/template" id="account-template").
       <div class="account">
         <% include editor-template %>
-        <div class="view<%= isNewObject ? ' hide' : '' %>">
-          <h3><%= name %></h3>
-          <table>
-            <tr>
-              <td><strong>Initial (Current) Balance</strong></td>
-              <td>$<%= initialBalance %></td>
-            </tr>
-            <tr>
-              <td><strong>APR (.xxxx)</strong></td>
-              <td><%= apr %></td>
-            </tr>
-            <tr>
-              <td><strong>Minimum Monthly Payment</strong></td>
-              <td>$<%= minimumPayment %>/month</td>
-            </tr>
-          </table>
-          <a class="button edit-button">Edit</a>
-        </div>
+        <% include viewer-template %>
       </div>
 
     script(type="text/template" id="loan-template").
       <div class="loan">
         <% include editor-template %>
-        <div class="view<%= isNewObject ? ' hide' : '' %>">
-          <h3><%= name %></h3>
-          <table>
-            <tr>
-              <td><strong>Initial (Current) Balance</strong></td>
-              <td>$<%= initialBalance %></td>
-            </tr>
-            <tr>
-              <td><strong>APR (.xxxx)</strong></td>
-              <td><%= apr %></td>
-            </tr>
-            <tr>
-              <td><strong>Minimum Monthly Payment</strong></td>
-              <td>$<%= minimumPayment %>/month</td>
-            </tr>
-          </table>
-          <div>
-            <% include loan-details-template %>
-          </div>
-          <a class="button edit-button">Edit</a>
-        </div>
+        <% include viewer-template %>
       </div>
 
     script(type="text/template" id="loan-details-template").
