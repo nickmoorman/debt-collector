@@ -21,6 +21,14 @@ $(function() {
     },
     calculateFutureValue: function(months) {
       return this.get("initialBalance")*Math.pow((1+(this.get("apr")/12)), months);
+    },
+    calculateBalance: function(months) {
+      if (months == 0) {
+        return parseFloat(this.get("initialBalance"));
+      } else {
+        // TODO: Verify this formula
+        return this.calculateBalance(months-1)*(1+(this.get("apr")/12)) - this.get("minimumPayment");
+      }
     }
   });
   var Loan = Account.extend({
@@ -144,15 +152,13 @@ $(function() {
     el: $("#debt-collector-app"),
     events: {
       "click #add-account": "createAccount",
-      "click #accounts-done": "runBasicCalculations",
       "click #add-loan": "createLoan"
     },
     initialize: function() {
       this.listenTo(Accounts, "add", this.addAccount);
       this.listenTo(Accounts, "reset", this.addAllAccounts);
       this.listenTo(Accounts, "all", this.render);
-      this.listenTo(Accounts, "add", this.showDoneButton);
-      this.listenTo(Accounts, "remove", this.hideDoneButton);
+      this.listenTo(Accounts, "sync", this.showAccountsSummary);
       this.listenTo(Loans, "add", this.addLoan);
       this.listenTo(Loans, "reset", this.addAllLoans);
       this.listenTo(Loans, "all", this.render);
@@ -172,26 +178,11 @@ $(function() {
     },
     addAllAccounts: function() {
       Accounts.each(this.addAccount, this);
+      this.showAccountsSummary();
     },
-    showDoneButton: function() {
-      if (Accounts.length > 0) {
-        if ($("#accounts-done").hasClass("hidden")) {
-          $("#accounts-done").removeClass("hidden");
-        }
-      }
-    },
-    hideDoneButton: function() {
-      if (Accounts.length == 0) {
-        if (!$("#accounts-done").hasClass("hidden")) {
-          $("#accounts-done").addClass("hidden");
-        }
-      }
-    },
-    runBasicCalculations: function() {
-      $("#basics").removeClass("hide");
-      var basicsTemplate = _.template($("#account-basics-template").html());
+    showAccountsSummary: function() {
+      var detailsTemplate = _.template($("#loan-details-template").html());
 
-      var data = [];
       var allAccounts = {
         name: "All Accounts",
         minimumPayment: 0,
@@ -199,6 +190,10 @@ $(function() {
         futureValue: 0,
         interest: 0
       };
+      var labels = [],
+          totalData = [],
+          balanceData = [],
+          interestData = [];
       Accounts.each(function(model, index) {
         var vars = model.toJSON();
         vars["months"] = model.solveForTime().toFixed(2);
@@ -211,14 +206,70 @@ $(function() {
         allAccounts["futureValue"] = parseFloat(allAccounts["futureValue"]) + parseFloat(vars["futureValue"]);
         allAccounts["interest"] = parseFloat(allAccounts["interest"]) + parseFloat(vars["interest"]);
 
-        data.push(vars);
+        // Calculate graph data
+        for (var i = 0; i <= Math.ceil(model.solveForTime().toFixed(2)); i++) {
+          var futureValue = model.calculateFutureValue(i).toFixed(2),
+              balance = model.calculateBalance(i).toFixed(2),
+              interest = futureValue - vars["initialBalance"];
+          if (labels.length < i+1) {
+            labels.push(i);
+            totalData.push(futureValue);
+            balanceData.push(balance);
+            interestData.push(interest);
+          } else {
+            totalData[i] = totalData[i] + futureValue;
+            balanceData[i] = balanceData[i] + balance;
+            interestData[i] = interestData[i] + interest;
+          }
+        };
       });
       allAccounts["minimumPayment"] = allAccounts["minimumPayment"].toFixed(2);
       allAccounts["futureValue"] = allAccounts["futureValue"].toFixed(2);
       allAccounts["interest"] = allAccounts["interest"].toFixed(2);
-      data.push(allAccounts);
 
-      $("#basics-list").append(basicsTemplate({data: data}));
+      $("#account-summary").html(detailsTemplate(allAccounts));
+
+      // This takes the first account and displays the balance and accrued interest over the duration of
+      // payoff on a line graph
+      // var labels = [],
+      //     totalData = [],
+      //     balanceData = [],
+      //     interestData = [],
+      //     account = Accounts.at(0);
+      // for (var i = 0; i < Math.ceil(account.solveForTime().toFixed(2)); i++) {
+      //   labels.push(i);
+      //   totalData.push(account.calculateFutureValue(i).toFixed(2));
+      //   balanceData.push(account.calculateBalance(i).toFixed(2));
+      //   interestData.push(totalData[i] - account.get("initialBalance"));
+      // };
+      var data = {
+        labels : labels,
+        datasets : [
+          /*{
+            fillColor : "rgba(220,220,220,0.5)",
+            strokeColor : "rgba(220,220,220,1)",
+            pointColor : "rgba(220,220,220,1)",
+            pointStrokeColor : "#fff",
+            data : totalData
+          },*/
+          {
+            fillColor : "rgba(151,187,205,0.5)",
+            strokeColor : "rgba(151,187,205,1)",
+            pointColor : "rgba(151,187,205,1)",
+            pointStrokeColor : "#fff",
+            data : balanceData
+          },
+          {
+            fillColor : "rgba(220,50,50,0.5)",
+            strokeColor : "rgba(220,50,50,1)",
+            pointColor : "rgba(220,50,50,1)",
+            pointStrokeColor : "#fff",
+            data : interestData
+          }
+        ]
+      };
+      var ctx = $("#summary-chart").get(0).getContext("2d");
+      var summaryChart = new Chart(ctx).Line(data);
 
       Loans.fetch();
     },

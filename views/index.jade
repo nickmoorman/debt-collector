@@ -12,15 +12,14 @@ block content
     section#accounts
       p Let's begin by adding your debt accounts.
       a#add-account.button Add Account
-      a#accounts-done.button.hidden Done Adding Accounts
       ul#account-list.no-bullet.small-block-grid-3
 
-    section#basics.hide
-      p.
-        Great!  Now that we know about your debt, let's do some basic math
-        to figure out where we stand.
+    section#basics
       .row.full-width
-        #basics-list.small-8.column
+        .small-8.column
+          h3 Summary of Accounts
+          #account-summary
+          canvas#summary-chart(width="900" height="600")
         .small-4.column.panel
           p.
             <em>"How did you do that?"</em>, you may wonder.  The formulas used
@@ -47,6 +46,7 @@ block content
             From there, I was able to derive the following formula, which yields the number of
             months it will take for the debt to be completely paid off:
             \[ monthsToPayoff = \frac{\log{(\frac{\frac{-monthlyPayment}{\frac{apr}{12}}}{initialBalance-\frac{monthlyPayment}{\frac{apr}{12}}})}}{\log{(1+\frac{apr}{12})}} \]
+      h3 Consolidate
       p.
         If you're like me, you probably aren't too happy with these results.  Let's see what we can do
         to fix that by taking out a consolidation loan.
@@ -60,6 +60,7 @@ block content
     script(type="text/javascript" src="javascripts/libs/backbone-1.1.2.min.js")
     script(type="text/javascript" src="javascripts/libs/backbone.localStorage-1.1.7.min.js")
     script(type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+    script(type="text/javascript" src="javascripts/libs/chart-0.2.min.js")
     script(type="text/javascript" src="javascripts/debt-collector.js")
 
     script(type="text/template" id="editor-template").
@@ -117,22 +118,6 @@ block content
       it will take you <strong><%= months %></strong> months to pay off this debt in full.</p>
       <p>You will end up paying <strong>$<%= futureValue %></strong> total, <strong>$<%= interest %></strong> of which
       will be interest.</p>
-
-    script(type="text/template" id="account-basics-template").
-      <dl class="tabs" data-tab>
-        <% _.each(data, function(acct, index) { %>
-          <dd<%= index == 0 ? ' class="active"' : '' %>><a href="#panel-<%= index+1 %>"><%= acct.name %></a></dd>
-        <% }); %>
-      </dl>
-      <div class="tabs-content">
-        <% _.each(data, function(acct, index) { %>
-          <% var minimumPayment = acct.minimumPayment, months = acct.months, futureValue = acct.futureValue, interest = acct.interest; %>
-          <div class="content<%= index == 0 ? ' active' : '' %>" id="panel-<%= index+1 %>">
-            <% include loan-details-template %>
-          </div>
-        <% }); %>
-      </div>
-      <script>$(document).foundation();</script>
 
     script.
       $(document).foundation();
