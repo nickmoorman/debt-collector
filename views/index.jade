@@ -96,7 +96,8 @@ block content
           </tr>
         </table>
         <div>
-          <% include loan-details-template %>
+          <% include minimum-payoff-template %>
+          <% include variable-payoff-template %>
         </div>
         <a class="button edit-button">Edit</a>
       </div>
@@ -113,11 +114,22 @@ block content
         <% include viewer-template %>
       </div>
 
-    script(type="text/template" id="loan-details-template").
+    script(type="text/template" id="minimum-payoff-template").
       <p>Paying only the minimum monthly payment of $<strong><%= minimumPayment %></strong>/month,
       it will take you <strong><%= months %></strong> months to pay off this debt in full.</p>
       <p>You will end up paying <strong>$<%= futureValue %></strong> total, <strong>$<%= interest %></strong> of which
       will be interest.</p>
+
+    script(type="text/template" id="variable-payoff-template").
+      <div class="range-slider" data-slider data-options="start: 0; end: <%= minimumPayment*3 %>; initial: <%= minimumPayment %>;">
+        <span class="range-slider-handle"></span>
+        <span class="range-slider-active-segment"></span>
+        <input type="hidden" />
+      </div>
+      <p>Paying $<strong class="payment"><%= minimumPayment %></strong>/month, it will take
+      <strong class="months"><%= months %></strong> months to pay off this debt.</p>
+      <p>You will pay $<strong class="total"><%= futureValue %></strong> total,
+      $<strong class="interest"><%= interest %></strong> of which will be interest.</p>
 
     script.
       $(document).foundation();

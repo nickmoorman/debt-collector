@@ -100,6 +100,20 @@ $(function() {
         minimumPayment: this.$(".minimumPayment")
       };
 
+      $(document).foundation();
+      var self = this;
+      this.$("[data-slider]").on("change", function() {
+        var payment = $(this).attr("data-slider");
+        var months = self.model.solveForTime(payment).toFixed(2);
+        var total = self.model.calculateFutureValue(months).toFixed(2);
+        var interest = (total - self.model.get("initialBalance")).toFixed(2);
+
+        self.$(".payment").html(payment);
+        self.$(".months").html(months);
+        self.$(".total").html(total);
+        self.$(".interest").html(interest);
+      });
+
       return this;
     },
     edit: function() {
@@ -181,7 +195,7 @@ $(function() {
       this.showAccountsSummary();
     },
     showAccountsSummary: function() {
-      var detailsTemplate = _.template($("#loan-details-template").html());
+      var detailsTemplate = _.template($("#minimum-payoff-template").html());
 
       var allAccounts = {
         name: "All Accounts",
